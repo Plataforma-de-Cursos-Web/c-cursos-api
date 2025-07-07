@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: course_platform_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is not set}
+      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is not set}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - course_platform
+
+  nats:
+    image: nats:latest
+    container_name: course_platform_nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - course_platform
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+      args:
+        SERVICE_PATH: apps/auth-service
+    container_name: course_platform_auth
+    environment:
+      - PORT=${AUTH_SERVICE_PORT:?AUTH_SERVICE_PORT is not set}
+      - NATS_URL=${NATS_URL:?NATS_URL is not set}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set}
+      - DB_HOST=${DB_HOST:?DB_HOST is not set}
+      - DB_PORT=${DB_PORT:?DB_PORT is not set}
+      - DB_USERNAME=${DB_USERNAME:?DB_USERNAME is not set}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is not set}
+      - DB_NAME=${DB_NAME:?DB_NAME is not set}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - nats
+    networks:
+      - course_platform
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+      args:
+        SERVICE_PATH: apps/api-gateway
+    container_name: course_platform_gateway
+    environment:
+      - PORT=${API_GATEWAY_PORT:?API_GATEWAY_PORT is not set}
+      - NATS_URL=${NATS_URL:?NATS_URL is not set}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - nats
+    networks:
+      - course_platform
+
+volumes:
+  postgres_data:
+
+networks:
+  course_platform:
+    driver: bridge
