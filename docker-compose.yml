@@ -13,6 +13,20 @@ services:
     networks:
       - course_platform
 
+  postgres-courses:
+    image: postgres:15
+    container_name: course_platform_db_courses
+    environment:
+      POSTGRES_DB: ${DB_NAME_COURSES:?DB_NAME_COURSES is not set}
+      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is not set}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_courses:/var/lib/postgresql/data
+    networks:
+      - course_platform
+
   nats:
     image: nats:latest
     container_name: course_platform_nats
@@ -46,6 +60,30 @@ services:
     networks:
       - course_platform
 
+  courses-service:
+    build:
+      context: .
+      dockerfile: ./apps/courses-service/Dockerfile
+      args:
+        SERVICE_PATH: apps/courses-service
+    container_name: course_platform_courses
+    environment:
+      - PORT=${COURSES_SERVICE_PORT:?COURSES_SERVICE_PORT is not set}
+      - NATS_URL=${NATS_URL:?NATS_URL is not set}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set}
+      - DB_HOST_COURSES=${DB_HOST_COURSES:?DB_HOST_COURSES is not set}
+      - DB_PORT=${DB_PORT:?DB_PORT is not set}
+      - DB_USERNAME=${DB_USERNAME:?DB_USERNAME is not set}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is not set}
+      - DB_NAME_COURSES=${DB_NAME_COURSES:?DB_NAME_COURSES is not set}
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres-courses
+      - nats
+    networks:
+      - course_platform
+
   api-gateway:
     build:
       context: .
@@ -61,12 +99,14 @@ services:
       - "3000:3000"
     depends_on:
       - auth-service
+      - courses-service
       - nats
     networks:
       - course_platform
 
 volumes:
   postgres_data:
+  postgres_data_courses:
 
 networks:
   course_platform:
