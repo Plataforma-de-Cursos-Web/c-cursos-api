@@ -1,4 +1,5 @@
 services:
+  # auth service database
   postgres:
     image: postgres:15
     container_name: course_platform_db
@@ -13,6 +14,7 @@ services:
     networks:
       - course_platform
 
+  # courses service database
   postgres-courses:
     image: postgres:15
     container_name: course_platform_db_courses

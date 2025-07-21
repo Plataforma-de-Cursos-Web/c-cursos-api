@@ -33,8 +33,6 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(process.env.PORT || 3001);
   
-  console.log(`Auth Service running on: ${await app.getUrl()}`);
-  console.log(`Swagger docs available at: ${await app.getUrl()}/api/docs`);
+  console.log(`Auth Service running on port ${process.env.PORT || 3001}`);
 }
-
 bootstrap();

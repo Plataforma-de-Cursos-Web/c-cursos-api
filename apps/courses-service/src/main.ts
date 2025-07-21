@@ -31,8 +31,6 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(port);
 
-  console.log(`Serviço de cursos rodando na porta ${port}`);
-  console.log(`NATS em: ${configService.get('NATS_URL')}`);
+  console.log(`Courses Service running on port ${port}`);
 }
-
 bootstrap();

@@ -154,6 +154,20 @@ export class CoursesController {
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar curso' })
   @ApiParam({ name: 'id', description: 'ID do curso' })
+  @ApiBody({
+    type: UpdateCourseDto,
+    description: 'Dados do curso a serem atualizados',
+    examples: {
+      example1: {
+        summary: 'Exemplo de atualização de curso',
+        value: {
+          title: 'Curso Avançado de Node.js',
+          description: 'Curso atualizado com novos conteúdos e módulos',
+          status: 'published'
+        }
+      }
+    }
+  })
   @ApiResponse({ status: 200, description: 'Curso atualizado com sucesso', type: CourseResponseDto })
   @ApiResponse({ status: 404, description: 'Curso não encontrado' })
   @ApiResponse({ status: 403, description: 'Sem permissão para editar este curso' })
