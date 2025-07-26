@@ -97,6 +97,7 @@ services:
       - PORT=${API_GATEWAY_PORT:?API_GATEWAY_PORT is not set}
       - NATS_URL=${NATS_URL:?NATS_URL is not set}
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set}
+      - FRONTEND_URL=${FRONTEND_URL}
     ports:
       - "3000:3000"
     depends_on:
