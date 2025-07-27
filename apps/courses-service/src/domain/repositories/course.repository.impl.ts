@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Course } from '../entities/course.model';
 import { Module } from '../entities/module.model';
+import { Material } from '../entities/material.model';
 import {
   CourseRepository,
   CreateCourseData,
@@ -66,6 +67,12 @@ export class CourseRepositoryImpl implements CourseRepository {
         {
           model: Module,
           as: 'modules',
+          include: [
+            {
+              model: Material,
+              as: 'materials',
+            },
+          ],
         },
       ],
     });
