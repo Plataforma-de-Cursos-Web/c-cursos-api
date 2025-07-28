@@ -11,6 +11,8 @@ import { CreateCourseDto } from '../../application/dto/create-course.dto';
 import { UpdateCourseDto } from '../../application/dto/update-course.dto';
 import { CreateModuleDto } from '../../application/dto/create-module.dto';
 import { CreateMaterialDto } from '../../application/dto/create-material.dto';
+import { DeleteModuleUseCase } from '../../application/usecases/delete-module.usecase';
+import { DeleteModuleDto } from '../../application/dto/delete-module.dto';
 
 @Controller()
 export class CoursesController {
@@ -22,6 +24,7 @@ export class CoursesController {
     private readonly listCoursesUseCase: ListCoursesUseCase,
     private readonly addModuleUseCase: AddModuleUseCase,
     private readonly addMaterialUseCase: AddMaterialUseCase,
+    private readonly deleteModuleUseCase: DeleteModuleUseCase,
   ) {}
 
   @MessagePattern({ cmd: 'courses.create' })
@@ -95,6 +98,16 @@ export class CoursesController {
     try {
       const module = await this.addModuleUseCase.execute(data, data.instructorId);
       return { success: true, data: module };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  @MessagePattern({ cmd: 'courses.delete-module' })
+  async deleteModule(@Payload() data: DeleteModuleDto) {
+    try {
+      const module = await this.deleteModuleUseCase.execute(data.moduleId, data.courseId);
+      return { success: true, message: module };
     } catch (error) {
       return { success: false, error: error.message };
     }

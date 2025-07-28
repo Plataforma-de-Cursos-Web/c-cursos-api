@@ -38,6 +38,7 @@ import {
   ModuleResponseDto, 
   MaterialResponseDto 
 } from '../../application/dtos/courses-response.dto';
+import { DeleteModuleRequestDto } from '../../application/dtos/delete-module-request.dto';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -271,6 +272,51 @@ export class CoursesController {
       throw new HttpException(
         error.message || 'Falha ao adicionar módulo',
         error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Delete(':courseId/modules/:moduleId')
+  @ApiOperation({ summary: 'Deleta um módulo de um curso' })
+  @ApiParam({
+    name: 'courseId',
+    description: 'ID do curso que contém o módulo',
+    example: 'uuid-do-curso',
+  })
+  @ApiParam({
+    name: 'moduleId',
+    description: 'ID do módulo a ser deletado',
+    example: 'uuid-do-modulo',
+  })
+  @ApiResponse({ status: 204, description: 'Módulo deletado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Curso ou módulo não encontrado' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para deletar este módulo' })
+  async deleteModule(
+    @Param() params: DeleteModuleRequestDto,
+    @Req() req,
+  ): Promise<void> {
+    try {
+      const result = await firstValueFrom(
+        this.coursesService.send(
+          { cmd: 'courses.delete-module' },
+          {
+            courseId: params.courseId,
+            moduleId: params.moduleId,
+            instructorId: req.user.id,
+          },
+        ),
+      );
+
+      if (!result.success) {
+        throw new HttpException(
+          result.error,
+          result.error === 'NotFound' ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (err) {
+      throw new HttpException(
+        err.message || 'Falha ao deletar módulo',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
