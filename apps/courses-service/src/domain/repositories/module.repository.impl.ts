@@ -36,16 +36,11 @@ export class ModuleRepositoryImpl implements ModuleRepository {
     });
   }
 
-  async update(data: UpdateModuleData): Promise<Module> {
-    const { id, ...updateData } = data;
-    await this.moduleModel.update(updateData, { where: { id } });
-    
-    const updatedModule = await this.findById(id);
-    if (!updatedModule) {
-      throw new Error(`Module with id ${id} not found`);
-    }
-    
-    return updatedModule;
+  async update(module: UpdateModuleData): Promise<void> {
+    await this.moduleModel.update(
+      { ...(module as any) },
+      { where: { id: module.id } },
+    );
   }
 
   async delete(id: string): Promise<void> {

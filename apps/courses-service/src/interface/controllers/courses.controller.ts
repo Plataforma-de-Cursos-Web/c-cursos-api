@@ -11,6 +11,8 @@ import { CreateCourseDto } from '../../application/dto/create-course.dto';
 import { UpdateCourseDto } from '../../application/dto/update-course.dto';
 import { CreateModuleDto } from '../../application/dto/create-module.dto';
 import { CreateMaterialDto } from '../../application/dto/create-material.dto';
+import { UpdateModuleUseCase } from '../../application/usecases/update-module.usecase';
+import { UpdateModuleDto } from '../../application/dto/update-module.dto';
 
 @Controller()
 export class CoursesController {
@@ -22,6 +24,7 @@ export class CoursesController {
     private readonly listCoursesUseCase: ListCoursesUseCase,
     private readonly addModuleUseCase: AddModuleUseCase,
     private readonly addMaterialUseCase: AddMaterialUseCase,
+    private readonly updateModuleUseCase: UpdateModuleUseCase,
   ) {}
 
   @MessagePattern({ cmd: 'courses.create' })
@@ -109,4 +112,12 @@ export class CoursesController {
       return { success: false, error: error.message };
     }
   }
+
+  @MessagePattern('update_module')
+async updateModule(
+    @Payload() payload: { moduleId: string; data: UpdateModuleDto },
+) {
+    return this.updateModuleUseCase.execute(payload.moduleId, payload.data);
+}
+
 }

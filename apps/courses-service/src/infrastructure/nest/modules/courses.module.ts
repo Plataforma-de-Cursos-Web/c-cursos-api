@@ -21,6 +21,7 @@ import { Course } from '../../../domain/entities/course.model';
 import { Module as ModuleEntity } from '../../../domain/entities/module.model';
 import { Material } from '../../../domain/entities/material.model';
 import { JwtStrategy } from '../strategies/jwt.strategy';
+import { UpdateModuleUseCase } from 'apps/courses-service/src/application/usecases/update-module.usecase';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
     ListCoursesUseCase,
     AddModuleUseCase,
     AddMaterialUseCase,
+    UpdateModuleUseCase,
     {
       provide: COURSE_REPOSITORY_TOKEN,
       useClass: CourseRepositoryImpl,

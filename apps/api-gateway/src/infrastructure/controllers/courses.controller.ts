@@ -38,6 +38,7 @@ import {
   ModuleResponseDto, 
   MaterialResponseDto 
 } from '../../application/dtos/courses-response.dto';
+import { UpdateModuleDto } from '../../application/dtos/update-module.dto';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -346,5 +347,22 @@ export class CoursesController {
         error.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+
+  @Put(':courseId/modules/:moduleId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualizar um módulo' })
+  @ApiResponse({ status: 200, description: 'Módulo atualizado com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Módulo não encontrado.' })
+  async updateModule(
+    @Param('moduleId') moduleId: string,
+    @Body() updateModuleDto: UpdateModuleDto,
+  ) {
+    return this.coursesService.send('update_module', {
+      moduleId,
+      data: updateModuleDto,
+    });
   }
 }

@@ -19,7 +19,7 @@ export interface ModuleRepository {
   create(data: CreateModuleData): Promise<Module>;
   findById(id: string): Promise<Module | null>;
   findByCourse(courseId: string): Promise<Module[]>;
-  update(data: UpdateModuleData): Promise<Module>;
+  update(module: Module): Promise<void>;
   delete(id: string): Promise<void>;
   findWithMaterials(id: string): Promise<Module | null>;
 }
